@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "275271719731",
+    "project_id": "serene-log",
+    "storage_bucket": "serene-log.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:275271719731:android:3e318b867ec38b757b7c46",
+        "android_client_info": {
+          "package_name": "com.serenelog.serene_log"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCnTUE1OG2ZXlZnnz6abxM6VTcam6Wh-Ww"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
