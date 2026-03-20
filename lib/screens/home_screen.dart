@@ -215,22 +215,26 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                   Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text('$greeting,',
-                                  style: const TextStyle(
-                                      color: AppColors.textSecondary,
-                                      fontSize: 13,
-                                      letterSpacing: 0.3)),
-                              Text(_name,
-                                  style: const TextStyle(
-                                      color: AppColors.textPrimary,
-                                      fontSize: 28,
-                                      fontWeight: FontWeight.w800,
-                                      letterSpacing: 0.5,
-                                      fontStyle: FontStyle.italic)),
-                            ]),
+                        Expanded(
+                          child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text('$greeting,',
+                                    style: const TextStyle(
+                                        color: AppColors.textSecondary,
+                                        fontSize: 13,
+                                        letterSpacing: 0.3)),
+                                Text(_name,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: const TextStyle(
+                                        color: AppColors.textPrimary,
+                                        fontSize: 28,
+                                        fontWeight: FontWeight.w800,
+                                        letterSpacing: 0.5,
+                                        fontStyle: FontStyle.italic)),
+                              ]),
+                        ),
                         Row(children: [
                           // ✅ App Info icon
                           GestureDetector(

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import '../themes/app_theme.dart';
 
 class AboutScreen extends StatelessWidget {
@@ -119,6 +121,40 @@ class AboutScreen extends StatelessWidget {
             ])),
           const SizedBox(height: 16),
 
+          // Feedback & Ratings
+          _card(Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _sectionTitle(Icons.favorite_rounded, 'Love DayBloom?'),
+              const SizedBox(height: 12),
+              const Text(
+                'Your feedback helps us grow and improve. Let us know what you think or how we can make DayBloom even better for you!',
+                style: TextStyle(
+                  color: AppColors.textSecondary,
+                  fontSize: 13, height: 1.6)),
+              const SizedBox(height: 16),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton.icon(
+                  onPressed: () => _showFeedbackDialog(context),
+                  icon: const Icon(Icons.star_rounded, color: AppColors.amber),
+                  label: const Text('Rate & Send Feedback',
+                      style: TextStyle(fontSize: 14)),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.primary.withValues(alpha: 0.15),
+                    foregroundColor: AppColors.primary,
+                    elevation: 0,
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14),
+                        side: BorderSide(
+                            color: AppColors.primary.withValues(alpha: 0.3))),
+                  ),
+                ),
+              ),
+            ])),
+          const SizedBox(height: 16),
+
           // Developer — Lumora Ventures
           Container(
             width: double.infinity,
@@ -138,7 +174,7 @@ class AboutScreen extends StatelessWidget {
                 width: 80, height: 80,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: const Color(0xFF0D1B35),
+                  color: Colors.white,
                   boxShadow: [BoxShadow(
                     color: const Color(0xFFD4A843)
                         .withValues(alpha: 0.3),
@@ -268,5 +304,101 @@ class AboutScreen extends StatelessWidget {
             fontWeight: FontWeight.bold,
             fontSize: 15)),
     ]);
+  }
+
+  void _showFeedbackDialog(BuildContext context) {
+    int rating = 5;
+    final ctrl = TextEditingController();
+    bool isSaving = false;
+
+    showDialog(
+      context: context,
+      builder: (ctx) => StatefulBuilder(builder: (ctx, setState) {
+        return AlertDialog(
+          backgroundColor: AppColors.bgCard,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          title: const Text('Rate DayBloom', style: TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.bold)),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: List.generate(5, (index) {
+                  return IconButton(
+                    icon: Icon(
+                      index < rating ? Icons.star_rounded : Icons.star_outline_rounded,
+                      color: AppColors.amber,
+                      size: 36,
+                    ),
+                    onPressed: () => setState(() => rating = index + 1),
+                  );
+                }),
+              ),
+              const SizedBox(height: 16),
+              TextField(
+                controller: ctrl,
+                maxLines: 4,
+                style: const TextStyle(color: Colors.white, fontSize: 14),
+                decoration: InputDecoration(
+                  hintText: 'Any suggestions or feedback?',
+                  hintStyle: TextStyle(color: Colors.white.withValues(alpha: 0.3)),
+                  filled: true,
+                  fillColor: Colors.white.withValues(alpha: 0.05),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide.none,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: const Text('Cancel', style: TextStyle(color: AppColors.textMuted)),
+            ),
+            isSaving 
+                ? const Padding(padding: EdgeInsets.all(8.0), child: SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.primary)))
+                : ElevatedButton(
+                    onPressed: () async {
+                      setState(() => isSaving = true);
+                      try {
+                        final user = FirebaseAuth.instance.currentUser;
+                        await FirebaseFirestore.instance.collection('app_feedback').add({
+                          'uid': user?.uid ?? 'anonymous',
+                          'timestamp': FieldValue.serverTimestamp(),
+                          'rating': rating,
+                          'feedback': ctrl.text.trim(),
+                        });
+                        if (!ctx.mounted) return;
+                        Navigator.pop(ctx);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Thank you for your feedback! 💙', style: TextStyle(color: Colors.white)),
+                            backgroundColor: AppColors.primary,
+                          ),
+                        );
+                      } catch (e) {
+                        setState(() => isSaving = false);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('Failed to submit: $e', style: const TextStyle(color: Colors.white)),
+                            backgroundColor: Colors.redAccent,
+                          ),
+                        );
+                      }
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.primary,
+                      foregroundColor: Colors.white,
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                    ),
+                    child: const Text('Submit', style: TextStyle(fontWeight: FontWeight.bold)),
+                  ),
+          ],
+        );
+      }),
+    );
   }
 }

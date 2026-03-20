@@ -139,9 +139,10 @@ class _JournalScreenState extends State<JournalScreen> {
             padding: EdgeInsets.only(
               bottom: MediaQuery.of(ctx).viewInsets.bottom,
               left: 24, right: 24, top: 20),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
                 // Handle
                 Container(
                   width: 36, height: 4,
@@ -296,6 +297,7 @@ class _JournalScreenState extends State<JournalScreen> {
                 ]),
                 const SizedBox(height: 24),
               ]),
+            ),
           );
         },
       ),
