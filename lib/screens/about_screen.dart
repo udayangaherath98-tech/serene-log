@@ -101,7 +101,6 @@ class AboutScreen extends StatelessWidget {
                 ['✅', 'Daily To-Do List'],
                 ['🧘', 'Breathing & Calm Exercises'],
                 ['💙', 'Mood-based Calm Space'],
-                ['👥', 'Personal Contacts Manager'],
                 ['🌿', 'Psychology-based Themes'],
                 ['🔒', 'Private & Secure — Offline'],
               ])
@@ -321,18 +320,21 @@ class AboutScreen extends StatelessWidget {
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: List.generate(5, (index) {
-                  return IconButton(
-                    icon: Icon(
-                      index < rating ? Icons.star_rounded : Icons.star_outline_rounded,
-                      color: AppColors.amber,
-                      size: 36,
-                    ),
-                    onPressed: () => setState(() => rating = index + 1),
-                  );
-                }),
+              FittedBox(
+                fit: BoxFit.scaleDown,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: List.generate(5, (index) {
+                    return IconButton(
+                      icon: Icon(
+                        index < rating ? Icons.star_rounded : Icons.star_outline_rounded,
+                        color: AppColors.amber,
+                        size: 36,
+                      ),
+                      onPressed: () => setState(() => rating = index + 1),
+                    );
+                  }),
+                ),
               ),
               const SizedBox(height: 16),
               TextField(

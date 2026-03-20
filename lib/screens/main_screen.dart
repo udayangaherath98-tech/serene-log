@@ -7,6 +7,7 @@ import 'calendar_screen.dart';
 import 'journal_screen.dart' as journal;
 import 'todo_screen.dart';
 import 'login_screen.dart';
+import '../services/notification_service.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -16,6 +17,17 @@ class MainScreen extends StatefulWidget {
 
 class _MainScreenState extends State<MainScreen> {
   int _index = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _requestNotificationPermissions();
+  }
+
+  Future<void> _requestNotificationPermissions() async {
+    await Future.delayed(const Duration(milliseconds: 500));
+    await NotificationService.instance.requestPermissionsAsync();
+  }
 
   late final List<Widget> _screens = [
     HomeScreen(onSwitchToCalendar: () => setState(() => _index = 1)),

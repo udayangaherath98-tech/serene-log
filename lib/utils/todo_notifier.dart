@@ -6,3 +6,8 @@ class TodoNotifier {
   TodoNotifier._();
   static final instance = ValueNotifier<int>(0);
 }
+
+class EventNotifier {
+  EventNotifier._();
+  static final instance = ValueNotifier<int>(0);
+}

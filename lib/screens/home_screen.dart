@@ -78,9 +78,14 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     _startAutoRefresh();
     // Fix 3: listen to todo changes for instant dashboard update
     TodoNotifier.instance.addListener(_onTodoChanged);
+    EventNotifier.instance.addListener(_onEventChanged);
   }
 
   void _onTodoChanged() {
+    if (mounted) _loadData();
+  }
+
+  void _onEventChanged() {
     if (mounted) _loadData();
   }
 
@@ -152,6 +157,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     _breathController.dispose();
     _refreshTimer?.cancel();
     TodoNotifier.instance.removeListener(_onTodoChanged);
+    EventNotifier.instance.removeListener(_onEventChanged);
     super.dispose();
   }
 

@@ -3,6 +3,7 @@ import 'package:table_calendar/table_calendar.dart';
 import '../database/db_helper.dart';
 import '../themes/app_theme.dart';
 import '../services/notification_service.dart';
+import '../utils/todo_notifier.dart';
 
 class CalendarScreen extends StatefulWidget {
   const CalendarScreen({super.key});
@@ -198,13 +199,15 @@ class _CalendarScreenState extends State<CalendarScreen> {
                   Expanded(child: OutlinedButton(
                     onPressed: () async {
                       try {
-                        await NotificationService.instance
-                            .cancelEventReminder(event['id'] as int);
-                        await DBHelper.instance
-                            .deleteEvent(event['id'] as int);
+                        final int deleteId = int.tryParse(event['id'].toString()) ?? 0;
+                        await DBHelper.instance.deleteEvent(deleteId);
+                        try {
+                          await NotificationService.instance.cancelEventReminder(deleteId);
+                        } catch(e) { debugPrint('Notification cancel error: $e'); }
                       } catch (e) {
                         debugPrint('Delete error: $e');
                       }
+                      EventNotifier.instance.value++;
                       await _loadAll();
                       if (ctx.mounted) {
                         Navigator.pop(ctx);
@@ -238,11 +241,11 @@ class _CalendarScreenState extends State<CalendarScreen> {
                       if (event == null) {
                         id = await DBHelper.instance.insertEvent(row);
                       } else {
-                        id = event['id'] as int;
-                        await NotificationService.instance
-                            .cancelEventReminder(id);
-                        await DBHelper.instance
-                            .updateEvent({...row, 'id': id});
+                        id = int.tryParse(event['id'].toString()) ?? 0;
+                        await DBHelper.instance.updateEvent({...row, 'id': id});
+                        try {
+                          await NotificationService.instance.cancelEventReminder(id);
+                        } catch(e) { debugPrint('Notification cancel error: $e'); }
                       }
                       
                       if (selectedTime.isNotEmpty) {
@@ -258,6 +261,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                       debugPrint('Save error: $e');
                     }
                     
+                    EventNotifier.instance.value++;
                     await _loadAll();
                     if (ctx.mounted) {
                       Navigator.pop(ctx);

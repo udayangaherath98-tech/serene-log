@@ -23,7 +23,6 @@ class NotificationService {
           '@mipmap/ic_launcher'));
     await _plugin.initialize(settings);
     await _createChannels();
-    await _requestPermissions();
     await _scheduleDailyReminder();
   }
 
@@ -50,14 +49,17 @@ class NotificationService {
       ));
   }
 
-  Future<void> _requestPermissions() async {
+  Future<void> requestPermissionsAsync() async {
     final android = _plugin
         .resolvePlatformSpecificImplementation<
             AndroidFlutterLocalNotificationsPlugin>();
     if (android == null) return;
-    await android.requestNotificationsPermission();
-    // Opens Android system settings to allow exact alarms if not yet granted
-    await android.requestExactAlarmsPermission();
+    
+    try {
+      await android.requestNotificationsPermission();
+    } catch (e) {
+      debugPrint('Permission error: $e');
+    }
   }
 
   Future<void> scheduleEventReminder({
@@ -110,7 +112,7 @@ class NotificationService {
             playSound: true,
           ),
         ),
-        androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+        androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
         uiLocalNotificationDateInterpretation:
             UILocalNotificationDateInterpretation
                 .absoluteTime,
@@ -180,7 +182,7 @@ class NotificationService {
             importance: Importance.high,
             color: Color(0xFF7BAE8B)),
         ),
-        androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+        androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
         uiLocalNotificationDateInterpretation:
             UILocalNotificationDateInterpretation
                 .absoluteTime,
